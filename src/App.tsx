@@ -8,6 +8,7 @@ import StaffLoginPage  from './pages/StaffLoginPage'
 import StaffSalesPage  from './pages/StaffSalesPage'
 import ReportsPage     from './pages/ReportsPage'
 import ExpensesPage    from './pages/ExpensesPage'
+import RemoteViewPage  from './pages/RemoteViewPage'
 
 function RequireSetup({ children }: { children: JSX.Element }) {
   return isSetup() ? children : <Navigate to="/setup" replace />
@@ -38,6 +39,9 @@ export default function App() {
         } />
         <Route path="/expenses" element={
           <RequireSetup><ExpensesPage /></RequireSetup>
+        } />
+        <Route path="/remote-view" element={
+          <RequireSetup><RemoteViewPage /></RequireSetup>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

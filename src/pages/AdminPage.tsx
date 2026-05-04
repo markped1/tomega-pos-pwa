@@ -45,6 +45,8 @@ export default function AdminPage() {
         <button className="btn btn-outline" onClick={() => navigate('/expenses')}>💰 Expenses</button>
         <button className="btn btn-outline" onClick={() => navigate('/setup')}>⚙️ Settings</button>
         <button className="btn btn-outline" onClick={() => navigate('/staff-login')}>👥 Staff</button>
+        <button className="btn btn-outline" style={{ gridColumn: 'span 2', color: 'var(--primary)', borderColor: 'var(--primary)' }}
+          onClick={() => navigate('/remote-view')}>📱 View Sales Remotely (Live)</button>
       </div>
 
       {/* Products header */}

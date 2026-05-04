@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { ShoppingCart, Settings } from 'lucide-react'
 import { getAllActiveProducts, Product, CartItem, insertSales, Sale } from '../db/database'
 import { getSettings, formatCurrency } from '../store/settings'
+import { getBusinessId } from '../store/settings'
+import { pushSale } from '../firebase'
 import ProductRow from '../components/ProductRow'
 import CartDrawer from '../components/CartDrawer'
 import ReceiptModal from '../components/ReceiptModal'
@@ -62,6 +64,7 @@ export default function SalesPage() {
   }, [])
 
   function handleConfirmSale(items: CartItem[], transactionId: string) {
+    const bizId = getBusinessId(settings.businessName, settings.adminPin)
     const sales: Sale[] = items.map(item => ({
       productId:     item.product.id!,
       productName:   item.product.name,
@@ -75,6 +78,8 @@ export default function SalesPage() {
       saleDate:      Date.now()
     }))
     insertSales(sales)
+    // Push each sale to Firebase for remote view
+    sales.forEach(s => pushSale(bizId, s as unknown as Record<string, unknown>))
     setSoldItems(items)
     setTxId(transactionId)
     setCart([])

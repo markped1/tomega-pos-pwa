@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ShoppingCart, MoreVertical } from 'lucide-react'
 import { getAllActiveProducts, Product, CartItem, insertSales, Sale, getSalesByRange, startOfDay, endOfDay } from '../db/database'
 import { getSettings, formatCurrency } from '../store/settings'
+import { getBusinessId } from '../store/settings'
+import { pushSale } from '../firebase'
 import ProductRow from '../components/ProductRow'
 import CartDrawer from '../components/CartDrawer'
 import ReceiptModal from '../components/ReceiptModal'
@@ -92,6 +94,7 @@ export default function StaffSalesPage() {
   }, [])
 
   function handleConfirmSale(items: CartItem[], transactionId: string) {
+    const bizId = getBusinessId(settings.businessName, settings.adminPin)
     const sales: Sale[] = items.map(item => ({
       productId: item.product.id!, productName: item.product.name,
       quantity: item.quantity, sellingPrice: item.product.sellingPrice,
@@ -102,6 +105,7 @@ export default function StaffSalesPage() {
       transactionId, saleDate: Date.now()
     }))
     insertSales(sales)
+    sales.forEach(s => pushSale(bizId, s as unknown as Record<string, unknown>))
     setSoldItems(items); setTxId(transactionId)
     setCart([]); setCartOpen(false)
     setShowSuccess(true)
