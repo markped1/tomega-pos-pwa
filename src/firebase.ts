@@ -8,7 +8,6 @@ const firebaseConfig = {
   storageBucket:     'tomega-pos.firebasestorage.app',
   messagingSenderId: '178416220449',
   appId:             '1:178416220449:web:c12467b7a2515d4745a660',
-  // databaseURL added once Realtime Database is created
   databaseURL:       'https://tomega-pos-default-rtdb.firebaseio.com'
 }
 
