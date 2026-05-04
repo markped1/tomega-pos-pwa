@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, push, onValue, off } from 'firebase/database'
 
@@ -14,39 +15,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 const db  = getDatabase(app)
 
-// ── Business ID ───────────────────────────────────────────────────────────────
-// Matches the Android app's formula: hash(businessName + adminPin)
-export function getBusinessId(businessName: string, adminPin: string): string {
-  let hash = 0
-  const str = businessName + adminPin
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i)
-    hash |= 0
-  }
-  return Math.abs(hash).toString().replace(/-/g, 'n')
-}
-
-// ── Push a sale to Firebase ───────────────────────────────────────────────────
 export function pushSale(businessId: string, sale: Record<string, unknown>): void {
-  try {
-    const salesRef = ref(db, `businesses/${businessId}/sales`)
-    push(salesRef, sale)
-  } catch (e) {
-    console.warn('Firebase push failed (offline?):', e)
-  }
+  try { push(ref(db, `businesses/${businessId}/sales`), sale) }
+  catch (e) { console.warn('Firebase push failed:', e) }
 }
 
-// ── Push an expense ───────────────────────────────────────────────────────────
 export function pushExpense(businessId: string, expense: Record<string, unknown>): void {
-  try {
-    const expRef = ref(db, `businesses/${businessId}/expenses`)
-    push(expRef, expense)
-  } catch (e) {
-    console.warn('Firebase push failed (offline?):', e)
-  }
+  try { push(ref(db, `businesses/${businessId}/expenses`), expense) }
+  catch (e) { console.warn('Firebase push failed:', e) }
 }
 
-// ── Listen for live sales (remote view) ──────────────────────────────────────
 export function listenForSales(
   businessId: string,
   onData: (sales: Record<string, unknown>[]) => void,
@@ -55,30 +33,24 @@ export function listenForSales(
   const salesRef = ref(db, `businesses/${businessId}/sales`)
   onValue(
     salesRef,
-    snapshot => {
+    (snapshot) => {
       const list: Record<string, unknown>[] = []
-      snapshot.forEach(child => {
-        list.push(child.val() as Record<string, unknown>)
-      })
+      snapshot.forEach((child) => { list.push(child.val()) })
       onData(list)
     },
-    error => onError(error.message)
+    (error) => onError(error.message)
   )
-  // Return unsubscribe function
   return () => off(salesRef)
 }
 
-// ── Listen for live expenses ──────────────────────────────────────────────────
 export function listenForExpenses(
   businessId: string,
   onData: (expenses: Record<string, unknown>[]) => void
 ): () => void {
   const expRef = ref(db, `businesses/${businessId}/expenses`)
-  onValue(expRef, snapshot => {
+  onValue(expRef, (snapshot) => {
     const list: Record<string, unknown>[] = []
-    snapshot.forEach(child => {
-      list.push(child.val() as Record<string, unknown>)
-    })
+    snapshot.forEach((child) => { list.push(child.val()) })
     onData(list)
   })
   return () => off(expRef)

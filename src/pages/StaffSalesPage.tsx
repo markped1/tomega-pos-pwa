@@ -94,7 +94,7 @@ export default function StaffSalesPage() {
   }, [])
 
   function handleConfirmSale(items: CartItem[], transactionId: string) {
-    const bizId = getBusinessId(settings.businessName, settings.adminPin)
+    const bizId = getBusinessId()
     const sales: Sale[] = items.map(item => ({
       productId: item.product.id!, productName: item.product.name,
       quantity: item.quantity, sellingPrice: item.product.sellingPrice,
